@@ -1,0 +1,251 @@
+import java.util.Scanner;
+
+class Vehiculo {
+    String modelo;
+    String placa;
+    int kilometraje;
+    boolean tramado;
+    boolean cambioRadiador;
+    boolean cambioAceite;
+    boolean rectificarMotor;
+
+    public Vehiculo(String modelo, String placa, int kilometraje,
+                    boolean tramado, boolean cambioRadiador,
+                    boolean cambioAceite, boolean rectificarMotor) {
+        this.modelo = modelo;
+        this.placa = placa;
+        this.kilometraje = kilometraje;
+        this.tramado = tramado;
+        this.cambioRadiador = cambioRadiador;
+        this.cambioAceite = cambioAceite;
+        this.rectificarMotor = rectificarMotor;
+    }
+
+    public int contarProblemas() {
+        int problemas = 0;
+        if (tramado) problemas++;
+        if (cambioRadiador) problemas++;
+        if (cambioAceite) problemas++;
+        if (rectificarMotor) problemas++;
+        return problemas;
+    }
+
+    public String obtenerEstado() {
+        int problemas = contarProblemas();
+        if (problemas <= 1) {
+            return "Verde";
+        } else if (problemas == 2) {
+            return "Amarillo";
+        } else {
+            return "Rojo";
+        }
+    }
+
+    public int calcularMontoTotal() {
+        int montoTotal = 0;
+        if (tramado) montoTotal += 10000;
+        if (cambioRadiador) montoTotal += 17000;
+        if (cambioAceite) montoTotal += 22000;
+        if (rectificarMotor) montoTotal += 35000;
+        return montoTotal;
+    }
+
+    public double calcularDescuento(int montoTotal) {
+        if (montoTotal > 30000) {
+            return 0.15 * montoTotal;
+        } else {
+            return 0;
+        }
+    }
+
+    public void mostrarInformacion() {
+        System.out.println("Modelo del Vehículo: " + modelo);
+        System.out.println("Placa: " + placa);
+        System.out.println("Kilometraje: " + kilometraje);
+        System.out.print("Problemas: ");
+        if (tramado) System.out.print("Tramado ");
+        if (cambioAceite) System.out.print("Cambio Aceite ");
+        if (cambioRadiador) System.out.print("Cambio Radiador ");
+        if (rectificarMotor) System.out.print("Rectificar Motor ");
+        System.out.println();
+    }
+}
+
+class ReparaCar {
+    private static Vehiculo[] vehiculos = new Vehiculo[100];
+    private static int contadorVehiculos = 0;
+    private static double montoRecaudado = 0;
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int opcion;
+
+        do {
+            mostrarMenuPrincipal();
+            opcion = scanner.nextInt();
+            scanner.nextLine(); // Consumir el salto de línea después del número
+
+            switch (opcion) {
+                case 1:
+                    gestionarIngresoVehiculos(scanner);
+                    break;
+                case 2:
+                    mostrarEstados();
+                    break;
+                case 3:
+                    mostrarMontoRecaudado();
+                    break;
+                case 4:
+                    System.out.println("Ingreso finalizado.\nMenú principal");
+                    break;
+                default:
+                    System.out.println("Opción inválida. Por favor, seleccione una opción válida.");
+                    break;
+            }
+        } while (opcion != 4);
+    }
+
+    private static void mostrarMenuPrincipal() {
+        System.out.println("Menú principal:");
+        System.out.println("1. Ingreso de vehículos");
+        System.out.println("2. Estados");
+        System.out.println("3. Cobros");
+        System.out.println("4. Salir");
+        System.out.print("Seleccione una opción: ");
+    }
+
+    private static void gestionarIngresoVehiculos(Scanner scanner) {
+        int opcion;
+
+        do {
+            mostrarMenuIngresoVehiculos();
+            opcion = scanner.nextInt();
+            scanner.nextLine(); // Consumir el salto de línea después del número
+
+            switch (opcion) {
+                case 1:
+                    ingresarDatosVehiculo(scanner);
+                    break;
+                case 2:
+                    mostrarEstadoVehiculo(scanner);
+                    break;
+                case 3:
+                    realizarCobro(scanner);
+                    break;
+                case 4:
+                    System.out.println("Volver al Menú principal");
+                    break;
+                default:
+                    System.out.println("Opción inválida. Por favor, seleccione una opción válida.");
+                    break;
+            }
+        } while (opcion != 4);
+    }
+
+    private static void mostrarMenuIngresoVehiculos() {
+        System.out.println("Ingreso de vehículos:");
+        System.out.println("1. Datos del vehículo");
+        System.out.println("2. Estado del vehículo");
+        System.out.println("3. Cobro");
+        System.out.println("4. Volver al Menú principal");
+        System.out.print("Seleccione una opción: ");
+    }
+
+    private static void ingresarDatosVehiculo(Scanner scanner) {
+        System.out.print("Ingrese el modelo del vehículo: ");
+        String modelo = scanner.nextLine();
+        System.out.print("Ingrese la placa del vehículo: ");
+        String placa = scanner.nextLine();
+        System.out.print("Ingrese el kilometraje del vehículo: ");
+        int kilometraje = scanner.nextInt();
+        scanner.nextLine(); // Consumir el salto de línea después del número
+
+        boolean tramado = preguntarBooleano(scanner, "¿Necesita tramado? (S/N): ");
+        boolean cambioRadiador = preguntarBooleano(scanner, "¿Calienta, necesita cambio de radiador? (S/N): ");
+        boolean cambioAceite = preguntarBooleano(scanner, "¿Ocupa cambio de aceite? (S/N): ");
+        boolean rectificarMotor = preguntarBooleano(scanner, "¿Necesita rectificar motor? (S/N): ");
+
+        vehiculos[contadorVehiculos] = new Vehiculo(modelo, placa, kilometraje,
+                tramado, cambioRadiador, cambioAceite, rectificarMotor);
+        contadorVehiculos++;
+
+        System.out.println("Datos del vehículo ingresados correctamente.");
+    }
+
+    private static boolean preguntarBooleano(Scanner scanner, String mensaje) {
+        System.out.print(mensaje);
+        String respuesta = scanner.nextLine();
+        return respuesta.equalsIgnoreCase("S");
+    }
+
+    private static void mostrarEstadoVehiculo(Scanner scanner) {
+        System.out.print("Ingrese la placa del vehículo: ");
+        String placa = scanner.nextLine();
+
+        Vehiculo vehiculo = buscarVehiculo(placa);
+
+        if (vehiculo != null) {
+            System.out.println("Estado del vehículo: " + vehiculo.obtenerEstado());
+            vehiculo.mostrarInformacion();
+        } else {
+            System.out.println("No se encontró ningún vehículo con la placa proporcionada.");
+        }
+    }
+
+    private static Vehiculo buscarVehiculo(String placa) {
+        for (int i = 0; i < contadorVehiculos; i++) {
+            if (vehiculos[i].placa.equalsIgnoreCase(placa)) {
+                return vehiculos[i];
+            }
+        }
+        return null;
+    }
+
+    private static void realizarCobro(Scanner scanner) {
+        System.out.print("Ingrese la placa del vehículo: ");
+        String placa = scanner.nextLine();
+
+        Vehiculo vehiculo = buscarVehiculo(placa);
+
+        if (vehiculo != null) {
+            vehiculo.mostrarInformacion();
+
+            int montoTotal = vehiculo.calcularMontoTotal();
+            double descuento = vehiculo.calcularDescuento(montoTotal);
+            double montoFinal = montoTotal - descuento;
+
+            System.out.println("Monto total a cancelar: " + montoTotal);
+            System.out.println("Descuento aplicado: " + descuento);
+            System.out.println("Monto final a cancelar: " + montoFinal);
+
+            montoRecaudado += montoFinal;
+        } else {
+            System.out.println("No se encontró ningún vehículo con la placa proporcionada.");
+        }
+    }
+
+    private static void mostrarEstados() {
+        int verde = 0;
+        int amarillo = 0;
+        int rojo = 0;
+
+        for (int i = 0; i < contadorVehiculos; i++) {
+            int problemas = vehiculos[i].contarProblemas();
+            if (problemas <= 1) {
+                verde++;
+            } else if (problemas == 2) {
+                amarillo++;
+            } else {
+                rojo++;
+            }
+        }
+
+        System.out.println("Cantidad de vehículos en estado Verde: " + verde);
+        System.out.println("Cantidad de vehículos en estado Amarillo: " + amarillo);
+        System.out.println("Cantidad de vehículos en estado Rojo: " + rojo);
+    }
+
+    private static void mostrarMontoRecaudado() {
+        System.out.println("Monto recaudado por todos los vehículos atendidos en el taller: " + montoRecaudado);
+    }
+}
